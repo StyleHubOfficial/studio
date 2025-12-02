@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { z } from "zod";
-import { useFormState, useFormStatus } from "react-dom";
+import { useFormStatus } from "react-dom";
 
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -13,7 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { PasswordInput } from "./password-input";
 import { signUpSchema } from "@/lib/schemas";
 import { signup } from "@/app/auth/actions";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useActionState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { PasswordStrength } from "./password-strength";
 
@@ -31,7 +31,7 @@ function SubmitButton() {
 }
 
 export function SignUpForm({ onSignUpSuccess }: SignUpFormProps) {
-  const [state, formAction] = useFormState(signup, null);
+  const [state, formAction] = useActionState(signup, null);
   const { toast } = useToast();
   const [password, setPassword] = useState("");
 

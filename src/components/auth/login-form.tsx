@@ -3,9 +3,9 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { z } from "zod";
-import { useFormState, useFormStatus } from "react-dom";
+import { useFormStatus } from "react-dom";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useActionState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -28,7 +28,7 @@ function SubmitButton() {
 
 export function LoginForm() {
   const router = useRouter();
-  const [state, formAction] = useFormState(login, null);
+  const [state, formAction] = useActionState(login, null);
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof loginSchema>>({

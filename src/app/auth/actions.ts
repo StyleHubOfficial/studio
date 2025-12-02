@@ -1,59 +1,108 @@
-"use server";
+'use server';
 
-import { z } from "zod";
-import { loginSchema, signUpSchema } from "@/lib/schemas";
+import {
+  Auth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from 'firebase/auth';
+import {
+  doc,
+  Firestore,
+  serverTimestamp,
+  setDoc,
+} from 'firebase/firestore';
+import { z } from 'zod';
 
-type FormState = {
-    success?: boolean;
-    error?: string;
-} | null;
+import { initializeFirebase } from '@/firebase';
+import { loginSchema, signUpSchema } from '@/lib/schemas';
 
-export async function login(prevState: FormState, formData: FormData): Promise<FormState> {
+async function getFirebaseAuth(): Promise<Auth> {
+  const { auth } = initializeFirebase();
+  return auth;
+}
+
+async function getFirebaseFirestore(): Promise<Firestore> {
+  const { firestore } = initializeFirebase();
+  return firestore;
+}
+
+type FormState =
+  | {
+      success?: boolean;
+      error?: string;
+    }
+  | null;
+
+export async function login(
+  prevState: FormState,
+  formData: FormData
+): Promise<FormState> {
   const validatedFields = loginSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
 
   if (!validatedFields.success) {
     return {
-      error: "Invalid fields provided.",
+      error: 'Invalid fields provided.',
     };
   }
-  
-  // Simulate Firebase auth
-  await new Promise(res => setTimeout(res, 1000));
 
-  // In a real app, you'd call Firebase auth here.
-  // For this demo, we'll check for a dummy user.
-  if (validatedFields.data.emailOrPhone === "admin@example.com" && validatedFields.data.password === "Password123!") {
+  const auth = await getFirebaseAuth();
+  const { emailOrPhone, password } = validatedFields.data;
+
+  try {
+    await signInWithEmailAndPassword(auth, emailOrPhone, password);
     return { success: true };
+  } catch (e: any) {
+    return { error: 'Invalid credentials. Please try again.' };
   }
-
-  return { error: "Invalid credentials. Please try again." };
 }
 
+export async function signup(
+  prevState: FormState,
+  formData: FormData
+): Promise<FormState> {
+  const validatedFields = signUpSchema.safeParse(
+    Object.fromEntries(formData.entries())
+  );
 
-export async function signup(prevState: FormState, formData: FormData): Promise<FormState> {
-    const validatedFields = signUpSchema.safeParse(
-        Object.fromEntries(formData.entries())
+  if (!validatedFields.success) {
+    console.error(validatedFields.error.flatten().fieldErrors);
+    return {
+      error: 'Invalid fields. Please check your input and try again.',
+    };
+  }
+
+  const auth = await getFirebaseAuth();
+  const db = await getFirebaseFirestore();
+  const { email, password, role, clubId, fullName, phone } =
+    validatedFields.data;
+
+  try {
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password
     );
+    const user = userCredential.user;
 
-    if (!validatedFields.success) {
-        return {
-          error: "Invalid fields. Please check your input and try again.",
-        };
-    }
-
-    const { email, role, clubId, fullName, phone } = validatedFields.data;
-
-    // Simulate Firebase user creation & Firestore document write
-    await new Promise(res => setTimeout(res, 1500));
-    
-    console.log("Creating user:", { email, role, clubId, fullName, phone });
-    // In a real app:
-    // 1. If role is 'club_member', call a cloud function to validate clubId.
-    // 2. await auth.createUserWithEmailAndPassword(email, password);
-    // 3. await db.collection('users').doc(user.uid).set({ ... });
-    // 4. If 'club_member', call cloud function to set custom claims.
+    await setDoc(doc(db, 'users', user.uid), {
+      uid: user.uid,
+      email: user.email,
+      displayName: fullName,
+      phone: phone,
+      role: role,
+      clubId: clubId || null,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
 
     return { success: true };
+  } catch (e: any) {
+    console.error(e);
+    if (e.code === 'auth/email-already-in-use') {
+      return { error: 'An account with this email already exists.' };
+    }
+    return { error: 'An unexpected error occurred. Please try again.' };
+  }
 }

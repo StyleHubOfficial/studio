@@ -8,9 +8,7 @@ export const signUpSchema = z.object({
   fullName: z.string().min(2, { message: "Full name must be at least 2 characters." }),
   phone: z.string().min(10, { message: "Please enter a valid phone number." }),
   email: z.string().email({ message: "Please enter a valid email." }),
-  password: z.string().min(8, { message: "Password must be at least 8 characters." }).regex(passwordValidation, {
-    message: "Must contain an uppercase letter, a number, and a special character.",
-  }),
+  password: z.string().min(8, { message: "Password must be at least 8 characters." }),
   confirmPassword: z.string(),
   role: z.enum(['regular', 'club_member'], { required_error: "Please select a role." }),
   clubId: z.string().optional(),
@@ -31,7 +29,7 @@ export const signUpSchema = z.object({
 });
 
 export const loginSchema = z.object({
-  emailOrPhone: z.string().min(1, { message: "Email or Phone Number is required." }),
+  emailOrPhone: z.string().email({ message: "Please enter a valid email." }),
   password: z.string().min(1, { message: "Password is required." }),
   rememberMe: z.boolean().optional(),
 });

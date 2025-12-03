@@ -37,8 +37,8 @@ export function AnimatedBrand() {
             <stop offset="100%" style={{ stopColor: 'hsla(var(--accent), 0)', stopOpacity: 0 }} />
           </radialGradient>
         </defs>
-        {Array.from({ length: 15 }).map((_, i) => {
-          const size = Math.random() * 25 + 10;
+        {Array.from({ length: 10 }).map((_, i) => {
+          const size = Math.random() * 15 + 5;
           const x = Math.random() * 100;
           const y = Math.random() * 100;
           const delay = Math.random() * -45;
@@ -51,8 +51,9 @@ export function AnimatedBrand() {
               y={`${y}%`}
               width={size}
               height={size}
+              rx="4"
               fill="url(#grad1)"
-              opacity={Math.random() * 0.15 + 0.05}
+              opacity={Math.random() * 0.2 + 0.1}
             />
           );
         })}

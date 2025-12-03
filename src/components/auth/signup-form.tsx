@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -22,7 +23,7 @@ type SignUpFormProps = {
   onSignUpSuccess: () => void;
 }
 
-async function createUserProfile(db: any, user: User, data: any = {}) {
+function createUserProfile(db: any, user: User, data: any = {}) {
   const userRef = doc(db, 'users', user.uid);
   const userData = {
     id: user.uid,
@@ -68,7 +69,7 @@ export function SignUpForm({ onSignUpSuccess }: SignUpFormProps) {
       const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
       const user = userCredential.user;
 
-      await createUserProfile(db, user, {
+      createUserProfile(db, user, {
         displayName: values.fullName,
         phone: values.phone,
         role: values.role,

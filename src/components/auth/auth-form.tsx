@@ -23,26 +23,28 @@ const GoogleIcon = () => <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w
 const AppleIcon = () => <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" className="h-6 w-6"><title>Apple</title><path d="M12.003 17.81c-.003-3.234 2.22-4.897 4.408-4.907-1.035-1.62-2.835-1.923-4.417-1.923-3.419 0-5.992 2.37-5.992 5.658 0 3.337 2.68 4.965 5.992 4.965 1.455 0 2.926-.538 4.333-1.46-.11.06-2.906 1.67-4.324-1.533zm1.185-15.31c1.55-.05 3.015.908 3.828 2.235-1.285.88-2.54 2.64-2.223 4.507 1.44.138 3.23-1.145 4.398-2.6-2.13-2.29-5.12-2.5-6-.242-.01-.01 0 0 0 0z" fill="currentColor"/></svg>;
 
 
-async function createUserProfile(db: any, user: User) {
+function createUserProfile(db: any, user: User) {
   const userRef = doc(db, 'users', user.uid);
-  const userDoc = await getDoc(userRef);
-
-  if (!userDoc.exists()) {
-    const userData = {
-      id: user.uid,
-      email: user.email,
-      displayName: user.displayName || 'Anonymous User',
-      phone: user.phoneNumber || '',
-      role: 'user',
-      clubId: null,
-      createdAt: serverTimestamp(),
-      pinned: false,
-      prefs: '',
-      lastLogin: serverTimestamp(),
-    };
-    // Use non-blocking write
-    setDocumentNonBlocking(userRef, userData, { merge: false });
-  }
+  
+  // Check if user profile exists before creating
+  getDoc(userRef).then(userDoc => {
+    if (!userDoc.exists()) {
+      const userData = {
+        id: user.uid,
+        email: user.email,
+        displayName: user.displayName || 'Anonymous User',
+        phone: user.phoneNumber || '',
+        role: 'user',
+        clubId: null,
+        createdAt: serverTimestamp(),
+        pinned: false,
+        prefs: '',
+        lastLogin: serverTimestamp(),
+      };
+      // Use non-blocking write
+      setDocumentNonBlocking(userRef, userData, { merge: false });
+    }
+  });
 }
 
 export function AuthForm() {
@@ -60,7 +62,7 @@ export function AuthForm() {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       
-      // Don't await this, let it run in the background
+      // Let profile creation run in the background
       createUserProfile(db, user);
 
       // Redirect immediately

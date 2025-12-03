@@ -10,6 +10,8 @@ import { SignUpForm } from "./signup-form";
 import { LoginForm } from "./login-form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Languages } from "lucide-react";
+import { googleSignIn } from "@/app/auth/actions";
+import { useToast } from "@/hooks/use-toast";
 
 // Fake social icons for layout
 const GoogleIcon = () => <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" className="h-5 w-5"><title>Google</title><path d="M12.48 10.92v3.28h7.84c-.24 1.84-.85 3.18-1.73 4.1-1.05 1.05-2.86 2.25-4.82 2.25-3.73 0-6.75-3.1-6.75-6.95s3.02-6.95 6.75-6.95c2.18 0 3.52.86 4.38 1.69l2.6-2.58C18.04 3.82 15.61 2.5 12.48 2.5c-5.47 0-9.9 4.5-9.9 9.95s4.43 9.95 9.9 9.95c5.23 0 9.5-3.5 9.5-9.65 0-.64-.07-1.25-.2-1.83l-9.32.01z" fill="currentColor"/></svg>;
@@ -18,6 +20,23 @@ const AppleIcon = () => <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3
 
 export function AuthForm() {
   const [activeTab, setActiveTab] = useState("signin");
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const { toast } = useToast();
+
+  const handleGoogleSignIn = async () => {
+    setIsGoogleLoading(true);
+    try {
+      await googleSignIn();
+    } catch (error: any) {
+       toast({
+        variant: "destructive",
+        title: "Sign In Failed",
+        description: error.message || "An unexpected error occurred during Google Sign-In.",
+      });
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
   
   return (
     <Card className="w-full max-w-md bg-background/60 backdrop-blur-xl border-border/30 shadow-2xl shadow-black/20 rounded-2xl">
@@ -38,8 +57,10 @@ export function AuthForm() {
           </TabsList>
           <div className="py-6">
               <div className="flex items-center gap-4">
-                <Button variant="outline" className="w-full"><GoogleIcon /> Google</Button>
-                <Button variant="outline" className="w-full"><AppleIcon/> Apple</Button>
+                <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={isGoogleLoading}>
+                  {isGoogleLoading ? "Signing In..." : <><GoogleIcon /> Google</>}
+                  </Button>
+                <Button variant="outline" className="w-full" disabled><AppleIcon/> Apple</Button>
               </div>
               <div className="relative my-6">
                 <Separator />

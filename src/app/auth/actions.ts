@@ -3,15 +3,20 @@
 import {
   Auth,
   createUserWithEmailAndPassword,
+  GoogleAuthProvider,
   signInWithEmailAndPassword,
+  signInWithPopup,
+  User,
 } from 'firebase/auth';
 import {
   doc,
   Firestore,
   serverTimestamp,
   setDoc,
+  getDoc,
 } from 'firebase/firestore';
 import { z } from 'zod';
+import { redirect } from 'next/navigation';
 
 import { initializeFirebase } from '@/firebase';
 import { loginSchema, signUpSchema } from '@/lib/schemas';
@@ -58,6 +63,24 @@ export async function login(
   }
 }
 
+async function createUserProfile(db: Firestore, user: User, data: any = {}) {
+  const userRef = doc(db, 'users', user.uid);
+  const userDoc = await getDoc(userRef);
+
+  if (!userDoc.exists()) {
+    await setDoc(userRef, {
+      uid: user.uid,
+      email: user.email,
+      displayName: user.displayName || data.displayName,
+      phone: user.phoneNumber || data.phone,
+      role: data.role || 'regular',
+      clubId: data.clubId || null,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+  }
+}
+
 export async function signup(
   prevState: FormState,
   formData: FormData
@@ -75,7 +98,7 @@ export async function signup(
 
   const auth = await getFirebaseAuth();
   const db = await getFirebaseFirestore();
-  const { email, password, role, clubId, fullName, phone } =
+  const { email, password, fullName, phone, role, clubId } =
     validatedFields.data;
 
   try {
@@ -86,15 +109,11 @@ export async function signup(
     );
     const user = userCredential.user;
 
-    await setDoc(doc(db, 'users', user.uid), {
-      uid: user.uid,
-      email: user.email,
+    await createUserProfile(db, user, {
       displayName: fullName,
-      phone: phone,
-      role: role,
-      clubId: clubId || null,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
+      phone,
+      role,
+      clubId,
     });
 
     return { success: true };
@@ -104,5 +123,24 @@ export async function signup(
       return { error: 'An account with this email already exists.' };
     }
     return { error: 'An unexpected error occurred. Please try again.' };
+  }
+}
+
+export async function googleSignIn() {
+  const auth = await getFirebaseAuth();
+  const db = await getFirebaseFirestore();
+  const provider = new GoogleAuthProvider();
+
+  try {
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+    await createUserProfile(db, user);
+    redirect('/dashboard');
+  } catch (error: any) {
+    console.error('Google Sign-In Error:', error);
+    // This will be caught by the nearest error boundary
+    if (error.code !== 'auth/popup-closed-by-user') {
+      throw new Error('Failed to sign in with Google. Please try again.');
+    }
   }
 }

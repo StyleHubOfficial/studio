@@ -39,7 +39,7 @@ export function AuthForm() {
   };
   
   return (
-    <Card className="w-full max-w-md bg-background/60 backdrop-blur-xl border-border/30 shadow-2xl shadow-black/20 rounded-2xl">
+    <Card className="w-full max-w-md bg-card/60 backdrop-blur-xl border-border/30 shadow-2xl shadow-black/20 rounded-2xl">
       <CardHeader className="text-center">
         <div className="mx-auto h-12 w-12 mb-4 text-accent">
             <Logo />
@@ -64,7 +64,7 @@ export function AuthForm() {
               </div>
               <div className="relative my-6">
                 <Separator />
-                <span className="absolute left-1/2 -translate-x-1/2 -top-3 bg-card px-2 text-sm text-muted-foreground">OR</span>
+                <span className="absolute left-1/2 -translate-x-1/2 -top-3 bg-card/60 px-2 text-sm text-muted-foreground">OR</span>
               </div>
           </div>
           <TabsContent value="signin">

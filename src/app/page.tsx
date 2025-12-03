@@ -8,6 +8,8 @@ import AuthPage from '@/components/auth/auth-page';
 import { useUser } from '@/firebase/auth/use-user';
 import { Skeleton } from '@/components/ui/skeleton';
 
+export const dynamic = 'force-dynamic';
+
 export default function Home() {
   const { user, loading: userLoading } = useUser();
   const router = useRouter();

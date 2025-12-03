@@ -1,6 +1,6 @@
 {
   "functions": {
-    "src/ai/dev.ts": {
+    "**/*.ts*": {
       "maxDuration": 300
     }
   }

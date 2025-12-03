@@ -1,3 +1,4 @@
+
 export function AnimatedBrand() {
   return (
     <div className="absolute inset-0 z-0 overflow-hidden bg-secondary">
@@ -31,12 +32,13 @@ export function AnimatedBrand() {
             `}
           </style>
           <radialGradient id="grad1" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
-            <stop offset="0%" style={{ stopColor: 'hsla(var(--accent), 0.3)', stopOpacity: 1 }} />
+            <stop offset="30%" style={{ stopColor: 'hsla(var(--accent), 0.25)', stopOpacity: 1 }} />
+            <stop offset="80%" style={{ stopColor: 'hsla(var(--accent), 0.1)', stopOpacity: 0.5 }} />
             <stop offset="100%" style={{ stopColor: 'hsla(var(--accent), 0)', stopOpacity: 0 }} />
           </radialGradient>
         </defs>
         {Array.from({ length: 15 }).map((_, i) => {
-          const size = Math.random() * 100 + 50;
+          const size = Math.random() * 80 + 40;
           const x = Math.random() * 100;
           const y = Math.random() * 100;
           const delay = Math.random() * -25;
@@ -49,7 +51,7 @@ export function AnimatedBrand() {
               cy={`${y}%`}
               r={size}
               fill="url(#grad1)"
-              opacity={Math.random() * 0.1 + 0.05}
+              opacity={Math.random() * 0.2 + 0.1}
             />
           );
         })}

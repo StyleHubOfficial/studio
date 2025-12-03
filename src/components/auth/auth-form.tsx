@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -39,7 +40,7 @@ export function AuthForm() {
   };
   
   return (
-    <Card className="w-full max-w-md bg-auth-card/20 text-foreground backdrop-blur-xl border-border/30 shadow-2xl shadow-black/20 rounded-2xl">
+    <Card className="w-full max-w-md bg-auth-card/30 text-foreground backdrop-blur-lg border border-accent/30 shadow-2xl shadow-accent/10 rounded-2xl">
       <CardHeader className="text-center">
         <div className="mx-auto h-12 w-12 mb-4 text-accent">
             <Logo />

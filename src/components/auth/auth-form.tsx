@@ -39,19 +39,19 @@ export function AuthForm() {
   };
   
   return (
-    <Card className="w-full max-w-md bg-card/60 backdrop-blur-xl border-border/30 shadow-2xl shadow-black/20 rounded-2xl">
+    <Card className="w-full max-w-md bg-auth-card/20 text-foreground backdrop-blur-xl border-border/30 shadow-2xl shadow-black/20 rounded-2xl">
       <CardHeader className="text-center">
         <div className="mx-auto h-12 w-12 mb-4 text-accent">
             <Logo />
         </div>
         <CardTitle className="font-headline text-3xl">AI News Access</CardTitle>
-        <CardDescription>
+        <CardDescription className="text-foreground/80">
           Professional AI News — Personalized & Realtime
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="signin" className="w-full" onValueChange={setActiveTab} value={activeTab}>
-          <TabsList className="grid w-full grid-cols-2 bg-muted/50">
+          <TabsList className="grid w-full grid-cols-2 bg-black/10">
             <TabsTrigger value="signin">Sign In</TabsTrigger>
             <TabsTrigger value="signup">Sign Up</TabsTrigger>
           </TabsList>
@@ -64,7 +64,7 @@ export function AuthForm() {
               </div>
               <div className="relative my-6">
                 <Separator />
-                <span className="absolute left-1/2 -translate-x-1/2 -top-3 bg-card/60 px-2 text-sm text-muted-foreground">OR</span>
+                <span className="absolute left-1/2 -translate-x-1/2 -top-3 bg-auth-card/20 px-2 text-sm text-muted-foreground backdrop-blur-sm">OR</span>
               </div>
           </div>
           <TabsContent value="signin">

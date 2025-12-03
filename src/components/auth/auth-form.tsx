@@ -40,6 +40,7 @@ async function createUserProfile(db: any, user: User) {
       prefs: '',
       lastLogin: serverTimestamp(),
     };
+    // Use non-blocking write
     setDocumentNonBlocking(userRef, userData, { merge: false });
   }
 }
@@ -58,8 +59,13 @@ export function AuthForm() {
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
-      await createUserProfile(db, user);
+      
+      // Don't await this, let it run in the background
+      createUserProfile(db, user);
+
+      // Redirect immediately
       router.push('/dashboard');
+      
     } catch (error: any) {
       if (error.code !== 'auth/popup-closed-by-user') {
         toast({

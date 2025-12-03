@@ -3,9 +3,9 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { z } from "zod";
-import { useFormStatus } from "react-dom";
 import { useRouter } from "next/navigation";
-import { useEffect, useActionState } from "react";
+import { useState } from "react";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -13,23 +13,15 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PasswordInput } from "./password-input";
 import { loginSchema } from "@/lib/schemas";
-import { login } from "@/app/auth/actions";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/firebase";
 
-
-function SubmitButton() {
-  const { pending } = useFormStatus();
-  return (
-    <Button type="submit" className="w-full" disabled={pending}>
-      {pending ? "Signing In..." : "Sign In"}
-    </Button>
-  );
-}
 
 export function LoginForm() {
   const router = useRouter();
-  const [state, formAction] = useActionState(login, null);
+  const auth = useAuth();
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -40,20 +32,25 @@ export function LoginForm() {
     },
   });
 
-  useEffect(() => {
-    // We no longer check for state.success here because the action now redirects on success.
-    if (state?.error) {
+  const onSubmit = async (values: z.infer<typeof loginSchema>) => {
+    setIsLoading(true);
+    try {
+      await signInWithEmailAndPassword(auth, values.emailOrPhone, values.password);
+      router.push('/dashboard');
+    } catch (e: any) {
       toast({
         variant: "destructive",
         title: "Login Failed",
-        description: state.error,
+        description: "Invalid credentials. Please try again.",
       });
+    } finally {
+      setIsLoading(false);
     }
-  }, [state, router, toast]);
+  };
 
   return (
     <Form {...form}>
-      <form action={formAction} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="emailOrPhone"
@@ -61,7 +58,7 @@ export function LoginForm() {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="you@example.com" {...field} />
+                <Input placeholder="you@example.com" {...field} disabled={isLoading} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -74,7 +71,7 @@ export function LoginForm() {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <PasswordInput placeholder="••••••••" {...field} />
+                <PasswordInput placeholder="••••••••" {...field} disabled={isLoading} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -87,7 +84,7 @@ export function LoginForm() {
             render={({ field }) => (
               <FormItem className="flex flex-row items-center space-x-2 space-y-0">
                 <FormControl>
-                  <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                  <Checkbox checked={field.value} onCheckedChange={field.onChange} disabled={isLoading} />
                 </FormControl>
                 <FormLabel className="text-sm font-normal">Remember Me</FormLabel>
               </FormItem>
@@ -97,7 +94,9 @@ export function LoginForm() {
             Forgot password?
           </a>
         </div>
-        <SubmitButton />
+        <Button type="submit" className="w-full" disabled={isLoading}>
+          {isLoading ? "Signing In..." : "Sign In"}
+        </Button>
       </form>
     </Form>
   );

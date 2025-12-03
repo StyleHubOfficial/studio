@@ -38,7 +38,7 @@ export function AnimatedBrand() {
           </radialGradient>
         </defs>
         {Array.from({ length: 10 }).map((_, i) => {
-          const size = Math.random() * 8 + 4;
+          const size = Math.random() * 15 + 8;
           const x = Math.random() * 100;
           const y = Math.random() * 100;
           const delay = Math.random() * -45;

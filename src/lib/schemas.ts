@@ -10,7 +10,7 @@ export const signUpSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email." }),
   password: z.string().min(8, { message: "Password must be at least 8 characters." }),
   confirmPassword: z.string(),
-  role: z.enum(['regular', 'club_member'], { required_error: "Please select a role." }),
+  role: z.enum(['user', 'sunrise_member'], { required_error: "Please select a role." }),
   clubId: z.string().optional(),
   terms: z.boolean().refine(val => val === true, {
     message: "You must accept the terms and conditions."
@@ -19,12 +19,12 @@ export const signUpSchema = z.object({
   message: "Passwords don't match.",
   path: ["confirmPassword"],
 }).refine((data) => {
-    if (data.role === 'club_member') {
+    if (data.role === 'sunrise_member') {
         return !!data.clubId && data.clubId.length > 0;
     }
     return true;
 }, {
-    message: "Club ID is required for club members.",
+    message: "Club ID is required for Sunrise members.",
     path: ["clubId"],
 });
 

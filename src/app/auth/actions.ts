@@ -12,13 +12,12 @@ import {
   doc,
   Firestore,
   serverTimestamp,
-  setDoc,
   getDoc,
 } from 'firebase/firestore';
 import { z } from 'zod';
 import { redirect } from 'next/navigation';
 
-import { initializeFirebase } from '@/firebase';
+import { initializeFirebase, setDocumentNonBlocking } from '@/firebase';
 import { loginSchema, signUpSchema } from '@/lib/schemas';
 
 async function getFirebaseAuth(): Promise<Auth> {
@@ -57,7 +56,7 @@ export async function login(
 
   try {
     await signInWithEmailAndPassword(auth, emailOrPhone, password);
-    return { success: true };
+    redirect('/dashboard');
   } catch (e: any) {
     return { error: 'Invalid credentials. Please try again.' };
   }
@@ -68,16 +67,20 @@ async function createUserProfile(db: Firestore, user: User, data: any = {}) {
   const userDoc = await getDoc(userRef);
 
   if (!userDoc.exists()) {
-    await setDoc(userRef, {
-      uid: user.uid,
+    const userData = {
+      id: user.uid,
       email: user.email,
-      displayName: user.displayName || data.displayName,
-      phone: user.phoneNumber || data.phone,
-      role: data.role || 'regular',
+      displayName: user.displayName || data.displayName || 'Anonymous User',
+      phone: user.phoneNumber || data.phone || '',
+      role: data.role || 'user',
       clubId: data.clubId || null,
       createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-    });
+      pinned: false,
+      prefs: '',
+      lastLogin: serverTimestamp(),
+    };
+    // Use the non-blocking write function for creating the user profile
+    setDocumentNonBlocking(userRef, userData, { merge: false });
   }
 }
 
@@ -109,10 +112,11 @@ export async function signup(
     );
     const user = userCredential.user;
 
+    // The profile creation is now non-blocking
     await createUserProfile(db, user, {
       displayName: fullName,
       phone,
-      role,
+      role: role,
       clubId,
     });
 
@@ -134,12 +138,13 @@ export async function googleSignIn() {
   try {
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
+    // Profile creation is non-blocking
     await createUserProfile(db, user);
     redirect('/dashboard');
   } catch (error: any) {
     console.error('Google Sign-In Error:', error);
-    // This will be caught by the nearest error boundary
     if (error.code !== 'auth/popup-closed-by-user') {
+      // Re-throw to be caught by an error boundary if it's not a simple popup closure
       throw new Error('Failed to sign in with Google. Please try again.');
     }
   }

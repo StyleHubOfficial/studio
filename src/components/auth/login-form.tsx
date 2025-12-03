@@ -41,9 +41,7 @@ export function LoginForm() {
   });
 
   useEffect(() => {
-    if (state?.success) {
-      router.push("/dashboard");
-    }
+    // We no longer check for state.success here because the action now redirects on success.
     if (state?.error) {
       toast({
         variant: "destructive",

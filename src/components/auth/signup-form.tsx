@@ -43,7 +43,7 @@ export function SignUpForm({ onSignUpSuccess }: SignUpFormProps) {
       email: "",
       password: "",
       confirmPassword: "",
-      role: "regular",
+      role: "user",
       clubId: "",
       terms: false,
     },
@@ -157,15 +157,15 @@ export function SignUpForm({ onSignUpSuccess }: SignUpFormProps) {
                 >
                   <FormItem className="flex items-center space-x-3 space-y-0">
                     <FormControl>
-                      <RadioGroupItem value="regular" />
+                      <RadioGroupItem value="user" />
                     </FormControl>
-                    <FormLabel className="font-normal">Regular</FormLabel>
+                    <FormLabel className="font-normal">Regular User</FormLabel>
                   </FormItem>
                   <FormItem className="flex items-center space-x-3 space-y-0">
                     <FormControl>
-                      <RadioGroupItem value="club_member" />
+                      <RadioGroupItem value="sunrise_member" />
                     </FormControl>
-                    <FormLabel className="font-normal">School CLUB Member</FormLabel>
+                    <FormLabel className="font-normal">Sunrise Member</FormLabel>
                   </FormItem>
                 </RadioGroup>
               </FormControl>
@@ -173,7 +173,7 @@ export function SignUpForm({ onSignUpSuccess }: SignUpFormProps) {
             </FormItem>
           )}
         />
-        {role === "club_member" && (
+        {role === "sunrise_member" && (
           <FormField
             control={form.control}
             name="clubId"

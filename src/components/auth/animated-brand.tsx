@@ -1,25 +1,59 @@
 export function AnimatedBrand() {
-    return (
-      <div className="absolute inset-0 z-0 overflow-hidden bg-secondary">
-        <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" className="opacity-10">
-          <defs>
-            <pattern id="circuit" patternUnits="userSpaceOnUse" width="80" height="80">
-              <path d="M 10 10 L 30 10 L 30 30 L 10 30 Z" fill="none" stroke="hsl(var(--accent))" strokeWidth="1"/>
-              <path d="M 0 40 L 80 40 M 40 0 L 40 80" fill="none" stroke="hsl(var(--accent))" strokeWidth="0.5"/>
-              <circle cx="10" cy="10" r="2" fill="hsl(var(--accent))">
-                <animate attributeName="r" values="2;3;2" dur="1.5s" repeatCount="indefinite" />
-              </circle>
-              <circle cx="70" cy="70" r="2" fill="hsl(var(--accent))">
-                 <animate attributeName="r" values="2;3;2" dur="1.5s" begin="0.5s" repeatCount="indefinite" />
-              </circle>
-               <circle cx="30" cy="50" r="1.5" fill="hsl(var(--accent))">
-                 <animate attributeName="r" values="1.5;2.5;1.5" dur="1.5s" begin="1s" repeatCount="indefinite" />
-              </circle>
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#circuit)"/>
-        </svg>
-      </div>
-    );
-  }
-  
+  return (
+    <div className="absolute inset-0 z-0 overflow-hidden bg-secondary">
+      <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <style>
+            {`
+              .particle {
+                animation: move 25s linear infinite;
+              }
+              .particle-1 { animation-delay: -0.5s; }
+              .particle-2 { animation-delay: -1s; }
+              .particle-3 { animation-delay: -1.5s; }
+              .particle-4 { animation-delay: -2s; }
+              .particle-5 { animation-delay: -2.5s; }
+              /* ... add more if needed */
+
+              @keyframes move {
+                0% { transform: translate(0, 0); }
+                10% { transform: translate(10vw, -15vh); }
+                20% { transform: translate(-5vw, 10vh); }
+                30% { transform: translate(15vw, 5vh); }
+                40% { transform: translate(5vw, -20vh); }
+                50% { transform: translate(-10vw, 15vh); }
+                60% { transform: translate(20vw, -10vh); }
+                70% { transform: translate(-15vw, -5vh); }
+                80% { transform: translate(10vw, 10vh); }
+                90% { transform: translate(-20vw, 0vh); }
+                100% { transform: translate(0, 0); }
+              }
+            `}
+          </style>
+          <radialGradient id="grad1" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+            <stop offset="0%" style={{ stopColor: 'hsla(var(--accent), 0.3)', stopOpacity: 1 }} />
+            <stop offset="100%" style={{ stopColor: 'hsla(var(--accent), 0)', stopOpacity: 0 }} />
+          </radialGradient>
+        </defs>
+        {Array.from({ length: 15 }).map((_, i) => {
+          const size = Math.random() * 100 + 50;
+          const x = Math.random() * 100;
+          const y = Math.random() * 100;
+          const delay = Math.random() * -25;
+          return (
+            <circle
+              key={i}
+              className="particle"
+              style={{ animationDelay: `${delay}s` }}
+              cx={`${x}%`}
+              cy={`${y}%`}
+              r={size}
+              fill="url(#grad1)"
+              opacity={Math.random() * 0.1 + 0.05}
+            />
+          );
+        })}
+      </svg>
+    </div>
+  );
+}

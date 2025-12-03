@@ -32,13 +32,13 @@ export function AnimatedBrand() {
             `}
           </style>
           <radialGradient id="grad1" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
-            <stop offset="0%" style={{ stopColor: 'hsla(var(--accent), 0.15)', stopOpacity: 1 }} />
-            <stop offset="70%" style={{ stopColor: 'hsla(var(--accent), 0.05)', stopOpacity: 0.5 }} />
-            <stop offset="100%" style={{ stopColor: 'hsla(var(--accent), 0)', stopOpacity: 0 }} />
+            <stop offset="0%" style={{ stopColor: 'hsla(var(--accent), 0.25)', stopOpacity: 1 }} />
+            <stop offset="50%" style={{ stopColor: 'hsla(var(--chart-2), 0.15)', stopOpacity: 0.7 }} />
+            <stop offset="100%" style={{ stopColor: 'hsla(var(--chart-4), 0.05)', stopOpacity: 0 }} />
           </radialGradient>
         </defs>
         {Array.from({ length: 10 }).map((_, i) => {
-          const size = Math.random() * 15 + 5;
+          const size = Math.random() * 8 + 4;
           const x = Math.random() * 100;
           const y = Math.random() * 100;
           const delay = Math.random() * -45;
@@ -53,7 +53,7 @@ export function AnimatedBrand() {
               height={size}
               rx="4"
               fill="url(#grad1)"
-              opacity={Math.random() * 0.2 + 0.1}
+              opacity={Math.random() * 0.4 + 0.1}
             />
           );
         })}

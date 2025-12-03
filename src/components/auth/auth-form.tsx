@@ -40,7 +40,7 @@ export function AuthForm() {
   };
   
   return (
-    <Card className="w-full max-w-md bg-auth-card/50 text-foreground backdrop-blur-lg border border-accent/30 shadow-2xl shadow-accent/10 rounded-2xl">
+    <Card className="w-full max-w-md bg-auth-card/80 text-foreground backdrop-blur-lg border border-accent/30 rounded-2xl shadow-[0_0_15px_3px_hsla(var(--accent),0.4)]">
       <CardHeader className="text-center">
         <div className="mx-auto h-12 w-12 mb-4 text-accent">
             <Logo />

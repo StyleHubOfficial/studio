@@ -1,23 +1,24 @@
-
 {
   "entities": {
-    "UserProfile": {
-      "title": "User Profile",
-      "description": "Represents a user's profile information.",
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
       "type": "object",
+      "description": "Represents a user in the application.",
       "properties": {
-        "uid": {
+        "id": {
           "type": "string",
-          "description": "The user's unique ID."
-        },
-        "email": {
-          "type": "string",
-          "format": "email",
-          "description": "The user's email address."
+          "description": "Unique identifier for the user.",
+          "format": "uuid"
         },
         "displayName": {
           "type": "string",
-          "description": "The user's display name."
+          "description": "The user's full name."
+        },
+        "email": {
+          "type": "string",
+          "description": "The user's email address.",
+          "format": "email"
         },
         "phone": {
           "type": "string",
@@ -25,36 +26,269 @@
         },
         "role": {
           "type": "string",
-          "description": "The user's role.",
-          "enum": ["regular", "club_member"]
+          "description": "The user's role (user, admin, or sunrise_member)."
         },
         "clubId": {
           "type": "string",
-          "description": "The user's club ID, if applicable."
+          "description": "The ID of the school club the user belongs to (if applicable)."
         },
         "createdAt": {
           "type": "string",
-          "format": "date-time",
-          "description": "The timestamp when the user profile was created."
+          "description": "Timestamp indicating when the user account was created.",
+          "format": "date-time"
         },
-        "updatedAt": {
+        "prefs": {
           "type": "string",
-          "format": "date-time",
-          "description": "The timestamp when the user profile was last updated."
+          "description": "User preferences (language, theme, personalization)."
+        },
+        "pinned": {
+          "type": "boolean",
+          "description": "Admin-only flag to pin the user."
+        },
+        "lastLogin": {
+          "type": "string",
+          "description": "Timestamp of the user's last login.",
+          "format": "date-time"
         }
       },
-      "required": ["uid", "email", "displayName", "role", "createdAt", "updatedAt"]
+      "required": [
+        "id",
+        "displayName",
+        "email",
+        "phone",
+        "role",
+        "createdAt"
+      ]
+    },
+    "SchoolClubMember": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "SchoolClubMember",
+      "type": "object",
+      "description": "Represents a member of a school club.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the SchoolClubMember entity."
+        },
+        "clubId": {
+          "type": "string",
+          "description": "Reference to SchoolClub. (Relationship: SchoolClub 1:N SchoolClubMember)"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N SchoolClubMember)"
+        },
+        "assignedId": {
+          "type": "string",
+          "description": "Assigned ID for the club member."
+        },
+        "passwordHash": {
+          "type": "string",
+          "description": "Hashed password for the assigned ID (if applicable)."
+        },
+        "uploadStats": {
+          "type": "string",
+          "description": "Statistics related to the member's uploads."
+        },
+        "lastSubmission": {
+          "type": "string",
+          "description": "Timestamp of the member's last submission.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "clubId",
+        "userId"
+      ]
+    },
+    "Message": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Message",
+      "type": "object",
+      "description": "Represents a message in a conversation.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the message."
+        },
+        "conversationId": {
+          "type": "string",
+          "description": "Reference to Conversation. (Relationship: Conversation 1:N Message)"
+        },
+        "senderId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N Message (as sender))"
+        },
+        "content": {
+          "type": "string",
+          "description": "The message content."
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Timestamp of when the message was sent.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "conversationId",
+        "senderId",
+        "content",
+        "timestamp"
+      ]
+    },
+    "Conversation": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Conversation",
+      "type": "object",
+      "description": "Represents a conversation between users.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the conversation."
+        },
+        "participantIds": {
+          "type": "array",
+          "description": "References to Users. (Relationship: User N:N Conversation)",
+          "items": {
+            "type": "string"
+          }
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp of when the conversation was created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "participantIds",
+        "createdAt"
+      ]
+    },
+    "Notification": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Notification",
+      "type": "object",
+      "description": "Represents a user notification.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the notification."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N Notification)"
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of notification (e.g., new message, update, etc.)."
+        },
+        "content": {
+          "type": "string",
+          "description": "The content of the notification."
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Timestamp of when the notification was created.",
+          "format": "date-time"
+        },
+        "isRead": {
+          "type": "boolean",
+          "description": "Indicates whether the notification has been read."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "type",
+        "content",
+        "timestamp"
+      ]
     }
   },
   "auth": {
-    "providers": ["password", "google.com"]
+    "providers": [
+      "password",
+      "anonymous"
+    ]
   },
   "firestore": {
-    "/users/{userId}": {
-      "schema": {
-        "$ref": "#/entities/UserProfile"
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profile information. Includes fields for 'displayName', 'email', 'phone', 'role', 'clubId', 'createdAt', 'prefs', 'pinned', and 'lastLogin'. This structure enforces path-based ownership for user data.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            }
+          ]
+        }
       },
-      "description": "Stores user profile information, keyed by user ID."
-    }
+      {
+        "path": "/school_club/{clubId}/members/{userId}",
+        "definition": {
+          "entityName": "SchoolClubMember",
+          "schema": {
+            "$ref": "#/backend/entities/SchoolClubMember"
+          },
+          "description": "Stores membership information for school clubs. Includes fields for 'assignedId', 'passwordHash', 'uploadStats', and 'lastSubmission'.",
+          "params": [
+            {
+              "name": "clubId",
+              "description": "The unique identifier for the school club."
+            },
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/messages/{conversationId}/messages/{messageId}",
+        "definition": {
+          "entityName": "Message",
+          "schema": {
+            "$ref": "#/backend/entities/Message"
+          },
+          "description": "Stores individual messages within a conversation. Includes the denormalized 'participantIds' from the parent 'Conversation' to enable authorization independence. This enables rules to ensure only participants of a conversation can read the messages.",
+          "params": [
+            {
+              "name": "conversationId",
+              "description": "The unique identifier for the conversation."
+            },
+            {
+              "name": "messageId",
+              "description": "The unique identifier for the message."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/notifications/{userId}",
+        "definition": {
+          "entityName": "Notification",
+          "schema": {
+            "$ref": "#/backend/entities/Notification"
+          },
+          "description": "Stores user notifications. This enforces path-based ownership, where only the user can access their notifications.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "This Firestore structure is designed to support the AI News Access application, prioritizing security, scalability, and ease of debugging. It adheres to the core design principles of Authorization Independence, Clarity of Intent, DBAC (Database-Based Access Control), QAPs (Rules are not Filters), and Invariants.\n\n**Authorization Independence:**\n\n*   Authorization independence is achieved by avoiding `get()` calls in security rules. User roles are stored directly in the `users/{uid}` document. For collaborative data like messages, participant IDs are included directly within the message document, preventing the need to fetch conversation details to authorize access.\n\n**Structural Segregation:**\n\n*   User profiles are stored in `users/{uid}`, separating them from potentially public content. School club member data is nested under `school_club/{clubId}/members/{uid}`, segregating it from general user data and allowing for specific security rules.\n\n**Access Modeling:**\n\n*   **Private Data:** User profiles are stored using path-based ownership (`users/{uid}`), ensuring only the user and admins can access them.\n*   **Collaborative Data:** The `messages/{conversationId}/messages/{msgId}` path stores messages with participant IDs included in each message document. The security rules check for the presence of the user's ID in the `participants` array.\n*   **Global Roles (DBAC):** The user's role (`user`, `admin`, `sunrise_member`) is stored directly in the `users/{uid}` document, enabling easy role-based access control in security rules.\n\n**QAPs (Rules are not Filters):**\n\n*   The structure facilitates secure `list` operations by segregating data based on access requirements. For example, listing users requires admin privileges. Listing messages in a conversation is only possible if the user is a participant.\n\n**Invariants:**\n\n*   Timestamps (`createdAt`, `lastLogin`, `timestamp`) can be enforced using security rules to ensure their integrity.\n\nThe structure ensures that authorization context is denormalized where needed, leading to simple and robust security rules without relying on complex hierarchical dependencies. The explicit segregation of data based on access patterns makes security rules easier to understand and maintain."
   }
 }

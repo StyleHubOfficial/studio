@@ -1,8 +1,10 @@
+
 export const firebaseConfig = {
-  "projectId": "studio-5955188834-ec3a0",
-  "appId": "1:1091279342522:web:14547ab34014db3e74ab83",
-  "apiKey": "AIzaSyDfZDdAnSbNVGlODUxXtxCwQsukLWl6ACA",
-  "authDomain": "studio-5955188834-ec3a0.firebaseapp.com",
-  "measurementId": "",
-  "messagingSenderId": "1091279342522"
+  apiKey: "AIzaSyBc2qt6LsrwYf2bqKaWnyJcq4lF6Zt8l0s",
+  authDomain: "newsclub-905dc.firebaseapp.com",
+  projectId: "newsclub-905dc",
+  storageBucket: "newsclub-905dc.appspot.com",
+  messagingSenderId: "249607382076",
+  appId: "1:249607382076:web:68ba7c78f6a0406a970f39",
+  measurementId: "G-HFYVVY1Z2J"
 };

@@ -4,7 +4,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { GoogleAuthProvider, signInWithPopup, User } from "firebase/auth";
-import { doc, getDoc, serverTimestamp } from "firebase/firestore";
+import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,35 +16,32 @@ import { LoginForm } from "./login-form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Languages } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth, useFirestore, setDocumentNonBlocking } from "@/firebase";
+import { useAuth, useFirestore } from "@/firebase";
 
 // Fake social icons for layout
 const GoogleIcon = () => <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" className="h-5 w-5"><title>Google</title><path d="M12.48 10.92v3.28h7.84c-.24 1.84-.85 3.18-1.73 4.1-1.05 1.05-2.86 2.25-4.82 2.25-3.73 0-6.75-3.1-6.75-6.95s3.02-6.95 6.75-6.95c2.18 0 3.52.86 4.38 1.69l2.6-2.58C18.04 3.82 15.61 2.5 12.48 2.5c-5.47 0-9.9 4.5-9.9 9.95s4.43 9.95 9.9 9.95c5.23 0 9.5-3.5 9.5-9.65 0-.64-.07-1.25-.2-1.83l-9.32.01z" fill="currentColor"/></svg>;
 const AppleIcon = () => <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" className="h-6 w-6"><title>Apple</title><path d="M12.003 17.81c-.003-3.234 2.22-4.897 4.408-4.907-1.035-1.62-2.835-1.923-4.417-1.923-3.419 0-5.992 2.37-5.992 5.658 0 3.337 2.68 4.965 5.992 4.965 1.455 0 2.926-.538 4.333-1.46-.11.06-2.906 1.67-4.324-1.533zm1.185-15.31c1.55-.05 3.015.908 3.828 2.235-1.285.88-2.54 2.64-2.223 4.507 1.44.138 3.23-1.145 4.398-2.6-2.13-2.29-5.12-2.5-6-.242-.01-.01 0 0 0 0z" fill="currentColor"/></svg>;
 
 
-function createUserProfile(db: any, user: User) {
+async function createUserProfile(db: any, user: User) {
   const userRef = doc(db, 'users', user.uid);
-  
-  // Check if user profile exists before creating
-  getDoc(userRef).then(userDoc => {
-    if (!userDoc.exists()) {
-      const userData = {
-        id: user.uid,
-        email: user.email,
-        displayName: user.displayName || 'Anonymous User',
-        phone: user.phoneNumber || '',
-        role: 'user',
-        clubId: null,
-        createdAt: serverTimestamp(),
-        pinned: false,
-        prefs: '',
-        lastLogin: serverTimestamp(),
-      };
-      // Use non-blocking write
-      setDocumentNonBlocking(userRef, userData, { merge: false });
-    }
-  });
+  const userDoc = await getDoc(userRef);
+
+  if (!userDoc.exists()) {
+    const userData = {
+      id: user.uid,
+      email: user.email,
+      displayName: user.displayName || 'Anonymous User',
+      phone: user.phoneNumber || '',
+      role: 'user',
+      clubId: null,
+      createdAt: serverTimestamp(),
+      pinned: false,
+      prefs: '',
+      lastLogin: serverTimestamp(),
+    };
+    await setDoc(userRef, userData, { merge: false });
+  }
 }
 
 export function AuthForm() {
@@ -62,10 +59,10 @@ export function AuthForm() {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       
-      // Let profile creation run in the background
-      createUserProfile(db, user);
+      // Create user profile in firestore if it doesn't exist.
+      await createUserProfile(db, user);
 
-      // Redirect immediately
+      // Redirect to dashboard
       router.push('/dashboard');
       
     } catch (error: any) {
